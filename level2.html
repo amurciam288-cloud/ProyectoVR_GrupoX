@@ -6,14 +6,14 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
 
-<title>ARBERI JUEGO - NIVEL 2 JARDÍN</title>
+<title>ARBERI JUEGO - NIVEL DREAMY</title>
 
-<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
 
@@ -22,29 +22,24 @@
 body{
     margin:0;
     overflow:hidden;
-    background:#87ceeb;
+    background:#ffddee;
     font-family:Courier New;
 }
 
 #ui-top{
-
     position:absolute;
-
     top:20px;
-
     left:20px;
-
-    background:rgba(255,255,255,0.2);
-
+    background:rgba(255,255,255,0.4);
     padding:15px;
-
-    border:2px solid #ffffff;
-
-    color:white;
-
+    border:3px solid #ff9ecf;
+    color:#ff4fa3;
     z-index:10;
-
-    border-radius:15px;
+    border-radius:20px;
+    font-size:22px;
+    font-weight:bold;
+    box-shadow:0 0 25px #ffb6d9;
+    backdrop-filter:blur(5px);
 }
 
 </style>
@@ -55,7 +50,8 @@ AFRAME.registerComponent('motor-gameplay', {
 
     init:function(){
 
-         this.ultimaPlataforma = null;
+        this.plataformasVisitadas = new Set();
+
         this.puntos =
         parseInt(localStorage.getItem('puntajeAcumulado')) || 0;
 
@@ -66,12 +62,10 @@ AFRAME.registerComponent('motor-gameplay', {
         this.actualizarUI();
 
         window.addEventListener('keydown',(e)=>{
-
             this.keys[e.code]=true;
         });
 
         window.addEventListener('keyup',(e)=>{
-
             this.keys[e.code]=false;
         });
 
@@ -82,17 +76,17 @@ AFRAME.registerComponent('motor-gameplay', {
             if(!target) return;
 
             if(
-    target.classList.contains('suelo')
-    &&
-    target !== this.ultimaPlataforma
-){
+                target.classList.contains('suelo')
+                &&
+                !this.plataformasVisitadas.has(target)
+            ){
 
-    this.ultimaPlataforma = target;
+                this.plataformasVisitadas.add(target);
 
-    this.puntos += 300;
+                this.puntos += 300;
 
-    this.actualizarUI();
-}
+                this.actualizarUI();
+            }
 
             if(target.id==="lava"){
 
@@ -108,11 +102,13 @@ AFRAME.registerComponent('motor-gameplay', {
                     this.puntos
                 );
 
-                alert("¡NIVEL 2 COMPLETADO!");
+                alert("🌸 NIVEL DREAMY COMPLETADO 🌸");
 
                 setTimeout(()=>{
 
-                    window.location.href="level2.html";
+                    location.reload();
+
+                     window.location.href="level3.html";
 
                 },1500);
             }
@@ -170,9 +166,15 @@ AFRAME.registerComponent('seguir-camara',{
 
         if(!this.player) return;
 
+        const p = this.player.object3D.position;
+
         this.el.object3D.position.lerp(
 
-            this.player.object3D.position,
+            new THREE.Vector3(
+                p.x,
+                p.y + 5,
+                p.z + 12
+            ),
 
             0.05
         );
@@ -185,21 +187,7 @@ AFRAME.registerComponent('seguir-camara',{
 
 <body>
 
-<div id="ui-top"
-style="
-position:absolute;
-top:20px;
-left:20px;
-background:rgba(0,0,0,0.7);
-padding:15px;
-border:3px solid #FFD700;
-color:#FFD700;
-z-index:10;
-border-radius:15px;
-font-size:22px;
-font-weight:bold;
-box-shadow:0 0 20px #FFD700;
-">
+<div id="ui-top">
 
 🌸 PUNTOS:
 <span id="puntos-val">0</span>
@@ -208,25 +196,24 @@ box-shadow:0 0 20px #FFD700;
 
 <a-scene
 physics="gravity:-18"
-background="color:#87CEEB">
+background="color:#ffddee">
 
-<!-- PISO INFERIOR -->
+<!-- PISO -->
 
 <a-plane
 id="lava"
-
 static-body
-
 position="0 -6 0"
-
 rotation="-90 0 0"
-
 width="300"
-
 height="300"
+color="#7a3b69"
 
-color="#2E8B57">
-
+animation="property: material.color;
+           dir: alternate;
+           dur: 3000;
+           loop: true;
+           to: #a84f8d">
 </a-plane>
 
 <!-- SOL -->
@@ -234,82 +221,45 @@ color="#2E8B57">
 <a-sphere
 position="0 80 -100"
 radius="10"
-color="#FFD700">
+color="#fff0a8"
 
+animation="property: scale;
+           dir: alternate;
+           dur: 3000;
+           loop: true;
+           to: 1.2 1.2 1.2">
 </a-sphere>
 
 <!-- NUBES -->
 
-<a-sphere
-position="-20 40 -60"
-radius="6"
-color="white">
+<a-sphere position="-20 40 -60" radius="6" color="white"></a-sphere>
+<a-sphere position="-15 40 -60" radius="5" color="#fff5fa"></a-sphere>
 
-</a-sphere>
+<a-sphere position="25 35 -80" radius="7" color="white"></a-sphere>
+<a-sphere position="30 35 -80" radius="5" color="#fff5fa"></a-sphere>
 
-<a-sphere
-position="-15 40 -60"
-radius="5"
-color="white">
-
-</a-sphere>
-
-<a-sphere
-position="25 35 -80"
-radius="7"
-color="white">
-
-</a-sphere>
-
-<!-- FLORES DECORATIVAS -->
+<!-- FLORES -->
 
 <a-cylinder
 position="5 -4 -10"
 radius="0.1"
 height="2"
-color="green">
-
+color="#6ccf7d">
 </a-cylinder>
 
 <a-sphere
 position="5 -2.5 -10"
 radius="0.5"
-color="pink">
+color="#ff8fc8"
 
+animation="property: scale;
+           dir: alternate;
+           dur:1000;
+           loop:true;
+           to:1.3 1.3 1.3">
 </a-sphere>
 
-<a-cylinder
-position="-8 -4 -20"
-radius="0.1"
-height="2"
-color="green">
-
-</a-cylinder>
-
-<a-sphere
-position="-8 -2.5 -20"
-radius="0.5"
-color="yellow">
-
-</a-sphere>
-
-<a-cylinder
-position="12 -4 -30"
-radius="0.1"
-height="2"
-color="green">
-
-</a-cylinder>
-
-<a-sphere
-position="12 -2.5 -30"
-radius="0.5"
-color="red">
-
-</a-sphere>
-
-<!-- CAMINO -->
-<!-- INICIO -->
+<!-- PLATAFORMAS -->
 
 <a-box
 class="suelo"
@@ -318,10 +268,8 @@ position="0 0 0"
 width="8"
 height="0.5"
 depth="8"
-color="#8B4513">
+color="#ffcce5">
 </a-box>
-
-<!-- CAMINO FÁCIL -->
 
 <a-box
 class="suelo"
@@ -330,7 +278,13 @@ position="0 3 -10"
 width="6"
 height="0.5"
 depth="6"
-color="#90EE90">
+color="#ffd6f5"
+
+animation="property: position;
+           dir: alternate;
+           dur: 2500;
+           loop: true;
+           to: 0 4 -10">
 </a-box>
 
 <a-box
@@ -340,7 +294,7 @@ position="4 6 -18"
 width="5"
 height="0.5"
 depth="5"
-color="#FFB6C1">
+color="#ffe29a">
 </a-box>
 
 <a-box
@@ -350,7 +304,12 @@ position="-3 9 -26"
 width="5"
 height="0.5"
 depth="5"
-color="#FFD700">
+color="#d9c2ff"
+
+animation="property: rotation;
+           to:0 360 0;
+           dur:8000;
+           loop:true">
 </a-box>
 
 <a-box
@@ -360,7 +319,7 @@ position="5 12 -34"
 width="4"
 height="0.5"
 depth="4"
-color="#87CEFA">
+color="#c7f0ff">
 </a-box>
 
 <a-box
@@ -370,7 +329,13 @@ position="-4 15 -42"
 width="4"
 height="0.5"
 depth="4"
-color="#DA70D6">
+color="#ffb6d9"
+
+animation="property: material.emissive;
+           dir: alternate;
+           dur:1000;
+           loop:true;
+           to:#ffffff">
 </a-box>
 
 <a-box
@@ -380,94 +345,72 @@ position="0 18 -52"
 width="7"
 height="0.5"
 depth="7"
-color="#00FA9A">
+color="#d6fff0">
 </a-box>
 
-<!-- META -->
+<!-- PUENTE -->
 
 <a-box
 class="suelo"
 static-body
-position="0 22 -65"
-width="12"
-height="0.5"
-depth="12"
-color="#00FFFF">
-</a-box>
-
-<!-- PUENTE GIRATORIO -->
-
-<a-box
-class="suelo"
-
-static-body
-
 position="0 24 -78"
-
 width="10"
-
 height="0.4"
-
 depth="2"
-
-color="#00FA9A"
+color="#ffc2e6"
 
 animation="property: rotation;
            to:0 360 0;
-           dur:4500;
+           dur:6000;
            loop:true">
+</a-box>
 
+<!-- BARRAS -->
+
+<a-box
+static-body
+position="0 26 -84"
+width="12"
+height="0.3"
+depth="0.3"
+color="#ff8fc8"
+
+animation="property: rotation;
+           to:0 0 360;
+           dur:2000;
+           loop:true">
 </a-box>
 
 <!-- META -->
 
-<a-box
-class="suelo"
-
-static-body
-
-position="0 28 -95"
-
-width="12"
-
-height="0.5"
-
-depth="12"
-
-color="#00FFFF">
-
-</a-box>
-
 <a-entity
 id="meta"
-
 static-body
-
-position="0 31 -95">
+position="0 32 -95">
 
 <a-cylinder
 radius="3"
 height="6"
-color="#FF69B4"
+color="#ffb6d9"
 
 animation="property: rotation;
            to:0 360 0;
-           dur:3000;
-           loop:true">
+           dur:4000;
+           loop:true"
 
+animation__scale="property: scale;
+                  dir: alternate;
+                  dur: 1500;
+                  loop: true;
+                  to: 1.2 1.2 1.2">
 </a-cylinder>
 
 <a-text
-value="🌸 JARDÍN COMPLETADO 🌸"
-
+value="🌸 DREAMY COMPLETADO 🌸"
 align="center"
-
 color="white"
-
 position="0 6 0"
-
 scale="10 10 10">
-
 </a-text>
 
 </a-entity>
@@ -476,40 +419,31 @@ scale="10 10 10">
 
 <a-entity
 id="jugador"
-
 position="0 3 0"
-
 motor-gameplay
 
 dynamic-body="mass:2;
-              fixedRotation:true">
+fixedRotation:true">
 
 <a-sphere
 radius="0.4"
-color="#FAFF00">
-
+color="#fff0f7">
 </a-sphere>
 
 <a-sphere
 position="0 0.5 0"
 radius="0.25"
-color="#FAFF00">
-
+color="#ff9ecf">
 </a-sphere>
 
 <!-- ALAS -->
 
 <a-plane
 position="-0.5 0.1 0"
-
 width="0.7"
-
 height="0.4"
-
-color="WHITE"
-
-opacity="0.7"
-
+color="#ffffff"
+opacity="0.8"
 rotation="0 0 40"
 
 animation="property: rotation;
@@ -517,20 +451,14 @@ animation="property: rotation;
            dir:alternate;
            dur:400;
            loop:true">
-
 </a-plane>
 
 <a-plane
 position="0.5 0.1 0"
-
 width="0.7"
-
 height="0.4"
-
-color="#aeefff"
-
-opacity="0.7"
-
+color="#ffe6f2"
+opacity="0.8"
 rotation="0 0 -40"
 
 animation="property: rotation;
@@ -538,22 +466,18 @@ animation="property: rotation;
            dir:alternate;
            dur:400;
            loop:true">
-
 </a-plane>
 
 </a-entity>
 
-<!-- CÁMARA -->
+<!-- CAMARA -->
 
 <a-entity seguir-camara>
 
 <a-camera
 position="0 7 14"
-
 look-controls="enabled:false"
-
 wasd-controls="enabled:false">
-
 </a-camera>
 
 </a-entity>
@@ -562,24 +486,18 @@ wasd-controls="enabled:false">
 
 <a-light
 type="ambient"
-intensity="1">
-
+intensity="1"
+color="#fff0f8">
 </a-light>
 
 <a-light
 type="directional"
-
-intensity="1.5"
-
+intensity="1.4"
 position="10 20 0"
-
 color="#ffffff">
-
 </a-light>
 
 </a-scene>
-
-
 
 </body>
 </html>

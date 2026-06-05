@@ -89,7 +89,13 @@ AFRAME.registerComponent('motor-gameplay', {
                 this.puntos += 20000;
                 localStorage.setItem('puntajeAcumulado', this.puntos);
 
-                alert("🐝 NIVEL DE OBSTÁCULOS COMPLETADO 🐝");
+                alert("🏆 ¡FELICIDADES! HAS COMPLETADO TODOS LOS NIVELES 🏆");
+
+setTimeout(()=>{
+    window.location.href = "inde.html";
+},1200);
+
+                
 
                 setTimeout(()=>location.reload(),1200);
             }
